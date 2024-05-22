@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>mine sweeper</title>
+    <link rel="stylesheet" href="css/app.css">
+</head>
+
+<body onload="onInIt()">
+
+    <h2>Score: <span>0</span></h2>
+
+    <table class="board-container">
+        <tbody class="board"></tbody>
+    </table>
+
+    <div class="modal">
+        <div class="modal-content">
+            <p class="modal-msg"></p>
+          <p><button onclick="onInit()">play again</button></p>
+        </div>
+      
+      </div>
+
+   
+    <div class="footer">Sean Ermilov 2024 mine sweeper</div>
+    <script src="js/utils.js"></script>
+    <script src="js/game.js"></script>
+</body>
+
+</html>
