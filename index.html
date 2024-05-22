@@ -11,16 +11,16 @@
 
 <body onload="onInIt()">
 
-    <h2>Score: <span>0</span></h2>
-
-    <table class="board-container">
+    <h2>lives: <span>0</span></h2>
+    <h2><span class="smile-face" onclick="onInIt()">😊</span></h2>
+    <table class="board-container"oncontextmenu="disableRightClickMenu(event)">
         <tbody class="board"></tbody>
     </table>
 
     <div class="modal">
         <div class="modal-content">
             <p class="modal-msg"></p>
-          <p><button onclick="onInit()">play again</button></p>
+          <p><button onclick="onInit() ">play again</button></p>
         </div>
       
       </div>
