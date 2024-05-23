@@ -12,8 +12,8 @@ const FLAG = '🚩'
 const EMPTY = ''
 
 var gDifficlty = {
-  boardSize: 4,
-  mines: 2,
+  boardSize: 8,
+  mines: 4,
 }
 
 var gGame
@@ -22,8 +22,7 @@ function onInIt() {
   gBoard = buildBoard()
   gIsFirstClick = true
   resetScore()
-  gDifficlty = { boardSize: 4, mines: 2 }
-  gCountMarkedMines = gDifficlty.mines
+  gCountMarkedMines = 0
   renderBoard(gBoard)
   console.log('gBoard :', gBoard)
 }
@@ -68,6 +67,27 @@ function getMineNegs(cellI, cellJ) {
     }
   }
 }
+function showNugsCell(cellI, cellJ) {
+  for (var i = cellI - 1; i <= cellI + 1; i++) {
+    if (i < 0 || i > gBoard.length - 1) continue
+    for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+      if (j < 0 || j > gBoard[0].length - 1) continue
+      var cell = gBoard[i][j]
+      console.log('cell :', cell)
+      if (
+        cell.isMine ||
+        (cell.isShown && !gIsFirstClick) ||
+        (cell.isMarked && i !== j)
+      )
+        continue
+      renderCell({ i, j }, cell.mineAroundCount)
+      cell.isShown = true
+      gGame.shownCount++
+    }
+  }
+  console.log('gGame.shownCount :', gGame.shownCount)
+  console.log('gCountMarkedMines :', gCountMarkedMines)
+}
 
 function setMinesNegsCount(board) {
   for (var i = 0; i < board.length; i++) {
@@ -107,7 +127,6 @@ function onCellClicked(event, elcell, indexI, indexj) {
 
   var curCell = gBoard[indexI][indexj]
   var pos = { i: indexI, j: indexj }
-
   if (curCell.isShown) return
 
   //mark cell
@@ -116,7 +135,9 @@ function onCellClicked(event, elcell, indexI, indexj) {
     return
   }
 
-  if (gIsFirstClick) onFirstClick(curCell)
+  if (gIsFirstClick) {
+    onFirstClick(curCell, pos)
+  }
 
   if (curCell.isMine) {
     onCellMine(curCell, pos)
@@ -124,17 +145,25 @@ function onCellClicked(event, elcell, indexI, indexj) {
   }
 
   onCellNumber(curCell, pos)
+  if (gIsFirstClick) gIsFirstClick = false
 }
 
 function onCellNumber(curCell, pos) {
-  var countOfMine = curCell.mineAroundCount
-  if (curCell.isMarked) {
-    gGame.markedCount--
-    curCell.isMarked = false
+  var curMineCount = curCell.mineAroundCount
+  console.log('curMineCount :', curMineCount)
+  if (curMineCount) {
+    if (curCell.isMarked) {
+      gGame.markedCount--
+      curCell.isMarked = false
+    }
+    curCell.isShown = true
+    gGame.shownCount++
+    renderCell(pos, curMineCount)
+    console.log('Am i here?')
+  } else {
+    showNugsCell(pos.i, pos.j)
   }
-  curCell.isShown = true
-  gGame.shownCount++
-  renderCell(pos, countOfMine)
+  checkGameOver()
 }
 
 function onCellMine(curCell, pos) {
@@ -146,24 +175,23 @@ function onCellMine(curCell, pos) {
     gGame.markedCount--
   }
   curCell.isShown = true
-  gGame.shownCount++
 
-  if (!curCell.isMarked) gCountMarkedMines--
+  if (!curCell.isMarked) gCountMarkedMines++
   gDifficlty.mines--
   checkGameOver()
   renderCell(pos, '💣')
 }
 
-function onFirstClick(curCell) {
+function onFirstClick(curCell, pos) {
   curCell.isShown = true
-  gGame.shownCount++
   gGame.markedCount = 0
-  // placeMinesAtRandom()
-  gBoard[0][0].isMine = true
-  gBoard[0][1].isMine = true
+  placeMinesAtRandom()
+  // gBoard[0][0].isMine = true
+  // gBoard[0][1].isMine = true
   setMinesNegsCount(gBoard)
   renderBoard(gBoard)
-  gIsFirstClick = false
+  // renderCell(pos, curCell.countOfMine)
+  // gIsFirstClick = false
 }
 
 function renderCell(location, value) {
@@ -177,11 +205,11 @@ function onCellMarked(curCell, pos) {
   if (curCell.isMarked) {
     value = EMPTY
     gGame.markedCount--
-    if (curCell.isMine) gCountMarkedMines++
+    if (curCell.isMine) gCountMarkedMines--
   } else {
     value = FLAG
     gGame.markedCount++
-    if (curCell.isMine) gCountMarkedMines--
+    if (curCell.isMine) gCountMarkedMines++
   }
   checkGameOver()
   renderCell(pos, value)
@@ -191,7 +219,6 @@ function onCellMarked(curCell, pos) {
 function placeMinesAtRandom() {
   for (var i = 0; i < gDifficlty.mines; i++) {
     var pos = findEmptyPos()
-    console.log('pos :', pos)
     gBoard[pos.i][pos.j].isMine = true
   }
 }
@@ -207,21 +234,50 @@ function resetScore() {
     shownCount: 0,
     markedCount: 0,
     secsPassed: 0,
-    lives: 2,
+    lives: 3,
+  }
+  gDifficlty = {
+    boardSize: 4,
+    mines: 2,
   }
   document.querySelector('.smile-face').innerText = SMILEY
   updateLives()
 }
 
 function checkGameOver() {
+  var boardSize = Math.pow(gDifficlty.boardSize, 2)
   if (gGame.lives === 0) {
     gameOver(false)
-  } else if (
-    gCountMarkedMines === 0 &&
-    gGame.markedCount === gDifficlty.mines
-  ) {
+  } else if (gGame.shownCount + gCountMarkedMines === boardSize) {
     gameOver(true)
   }
+  // else if (
+  //   gCountMarkedMines === 0 &&
+  //   gGame.markedCount === gDifficlty.mines
+  // ) {
+  //   gameOver(true)
+  // }
+}
+
+function setDifficulty(element) {
+  var difficulty = element.getAttribute('data-difficulty')
+  if (difficulty === 'beginner') {
+    gDifficlty = {
+      boardSize: 4,
+      mines: 2,
+    }
+  } else if (difficulty === 'medium') {
+    gDifficlty = {
+      boardSize: 8,
+      mines: 14,
+    }
+  } else if (difficulty === 'expert') {
+    gDifficlty = {
+      boardSize: 12,
+      mines: 32,
+    }
+  }
+  onInIt()
 }
 
 function gameOver(isVictory) {
