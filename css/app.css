@@ -48,3 +48,7 @@ body {
   position: absolute;
   bottom: 0;
 }
+span.score{
+  margin: 10px;
+  border: 10px;
+}

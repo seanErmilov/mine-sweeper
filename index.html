@@ -9,7 +9,13 @@
   </head>
 
   <body onload="onInIt()">
-    <h2>lives: <span>0</span></h2>
+    <h2 class="score">
+      Lives: <span class="score lives">0</span>Hints:<span
+        class="score hints"
+        onclick="onHint()"
+        >💡 💡 💡</span
+      >
+    </h2>
     <h2>
       <button
         class="difficulty"
@@ -33,11 +39,22 @@
         Expert
       </button>
     </h2>
+    <h2>
+      <button class="safe-click" onclick="onSafeClick()">Safe Click</button>
+      <span>counter of safe clicks: <span>0</span></span>
+    </h2>
     <h2><span class="smile-face" onclick="onInIt()">😊</span></h2>
     <table class="board-container" oncontextmenu="disableRightClickMenu(event)">
       <tbody class="board"></tbody>
     </table>
-
+    <div class="score-board">
+      <h1>
+        best scores:
+        <table class="score-board-container">
+          <tbody class="score-board"></tbody>
+        </table>
+      </h1>
+    </div>
     <div class="modal">
       <div class="modal-content">
         <p class="modal-msg"></p>

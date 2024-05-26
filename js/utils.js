@@ -30,7 +30,7 @@ function findEmptyPos() {
   for (var i = 0; i < gBoard.length; i++) {
     for (var j = 0; j < gBoard.length; j++) {
       var cell = gBoard[i][j]
-      if (!cell.isMine && !cell.isShown) {
+      if (!cell.isMine && !cell.isShown && !cell.isMarked) {
         var pos = { i: i, j: j }
         emptyPoss.push(pos)
       }
